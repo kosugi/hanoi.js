@@ -13,7 +13,16 @@ var App = function() {
     var NUM_DISCS_MAX = 8;
     var SPEED_MIN = 0;
     var SPEED_MAX = 100;
-    var colors = ['#F66', '#FC6', '#FF6', '#CF6', '#6F6', '#6FC', '#6FF', '#6CF'];
+    var colors = [
+        ['#F66', '#C33'],
+        ['#FC6', '#C63'],
+        ['#FF6', '#CC3'],
+        ['#CF6', '#6C3'],
+        ['#6F6', '#3C3'],
+        ['#6FC', '#3C6'],
+        ['#6FF', '#3CC'],
+        ['#6CF', '#36C']
+    ];
 
     return {
 
@@ -56,7 +65,6 @@ var App = function() {
             initialize: function () {
                 $('#slider-discs').slider({ min: NUM_DISCS_MIN, max: NUM_DISCS_MAX, step: 1, value: this.model.get('numDiscs') });
                 $('#slider-speed').slider({ min: SPEED_MIN, max: SPEED_MAX, step: 1, value: this.model.get('speed') });
-                //$('.ui-slider-handle').draggable();
                 var canvas = $('#canvas');
                 canvas.css('width', canvas.attr('width'));
                 canvas.css('height', canvas.attr('height'));
@@ -127,19 +135,36 @@ var App = function() {
                 var canvas = $('#canvas');
                 var width = canvas.attr('width');
                 var height = canvas.attr('height');
+                var h = 14;
+                var gh = 35;
                 var ctx = canvas.get(0).getContext('2d');
+                ctx.lineWidth = 2;
+
                 ctx.fillStyle = '#FFF';
                 ctx.fillRect(0, 0, width, height);
+
+                var g = ctx.createLinearGradient(0, 0, width * 0.5, height * 1.5);
+                g.addColorStop(0, '#CFF');
+                g.addColorStop(1, '#EFF');
+                ctx.fillStyle = g;
+                ctx.fillRect(0, 0, width, height - gh + h);
+
+                ctx.fillStyle = '#944';
+                ctx.fillRect(0, height - gh + h, width, gh - h);
+
+                ctx.strokeStyle = '#CCC';
+                ctx.strokeRect(0, 0, width, height);
                 var poles = this.model.get('solver').poles();
-                console.log(poles);
+                ctx.lineWidth = 1;
                 _.each(poles, function(pole, x) {
                     _.each(pole, function(disc, y) {
                         var w = disc * 15;
-                        var h = 14;
                         var bx = 120 * x + 80;
-                        var by = height - 30 - y * h;
-                        ctx.fillStyle = colors[disc - 1];
-                        ctx.fillRect(bx - w / 2, by, w, h);
+                        var by = height - gh - y * h;
+                        ctx.fillStyle = colors[disc - 1][0];
+                        ctx.fillRect(bx - w / 2, by + 1, w, h - 1);
+                        ctx.strokeStyle = colors[disc - 1][1];
+                        ctx.strokeRect(bx - w / 2, by + 1, w, h - 1);
                     });
                 });
                 return this;
