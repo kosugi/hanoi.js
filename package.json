@@ -1,0 +1,24 @@
+{
+  "name": "hanoi",
+  "description": "The Tower of Hanoi in JS",
+  "homepage": "http://kosugi.github.io/hanoi.js/",
+  "author": {
+    "name": "KOSUGI Tomo",
+    "email": "kosugi.tomo+nospam@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kosugi/hanoi.js.git"
+  },
+  "version": "1.0.0",
+  "dependencies": {
+    "underscore": "*"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://raw.github.com/kosugi/hanoi.js/gh-pages/LICENSE"
+    }
+  ],
+  "readmeFilename": "README.md"
+}
