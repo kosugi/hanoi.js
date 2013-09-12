@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" />
+    <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.1/underscore-min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js"></script>
+
+    <script type="text/javascript" src="solver.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+
+    <style type="text/css">
+body {
+    padding: 3%;
+    background-color: #eee;
+}
+.container {
+    max-width: 440px;
+    padding: 3%;
+    margin: 0 auto;
+}
+.slider {
+    margin: 4px;
+}
+.slider-row {
+    padding: 3px;
+    margin: 0px auto;
+}
+#canvas {
+    margin: 12px auto;
+}
+    </style>
+    <script type="text/javascript">
+jQuery(function() {
+    var app = new App();
+    var hanoi = new app.Hanoi();
+    var hanoiView = new app.HanoiView({ model: hanoi });
+});
+    </script>
+    <title>The Tower of Hanoi</title>
+  </head>
+  <body>
+    <p>See also: <a href="https://github.com/kosugi/hanoi.js">https://github.com/kosugi/hanoi.js</a></p>
+    <div id="hanoi" class="container">
+      <div class="row">
+        <button id="btn-play" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-play"></span></button>
+        <button id="btn-pause" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-pause"></span></button>
+        <button id="btn-stop" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-stop"></span></button>
+      </div>
+      <div class="row slider-row">
+        Discs: <span id="value-discs"></span>
+        <div class="slider" id="slider-discs"></div>
+      </div>
+      <div class="row slider-row">
+        Speed: <span id="value-speed"></span>
+        <div class="slider" id="slider-speed"></div>
+      </div>
+      <div class="row">
+        <canvas id="canvas" width="400" height="150"></canvas>
+      </div>
+    </div>
+  </body>
+</html>
