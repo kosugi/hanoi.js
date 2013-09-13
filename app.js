@@ -13,6 +13,7 @@ var App = function() {
     var NUM_DISCS_MAX = 8;
     var SPEED_MIN = 0;
     var SPEED_MAX = 100;
+    var MOVING_SLICE = 10;
     var colors = [
         ['#F66', '#C33'],
         ['#FC6', '#C63'],
@@ -24,13 +25,34 @@ var App = function() {
         ['#6CF', '#36C']
     ];
 
+    var PolesState = function(poles, moves) {
+        if (moves) {
+            this.fx = moves[0];
+            this.tx = moves[1];
+            var f = poles[this.fx];
+            var t = poles[this.tx];
+            this.disc = f.pop();
+            this.fy = f.length;
+            this.ty = t.length;
+            this.count = MOVING_SLICE;
+        }
+        this.poles = poles;
+    };
+
+    var canvas = $('#canvas'); // どうなの
+    var width = canvas.attr('width');
+    var height = canvas.attr('height');
+    var h = 14;
+    var gh = 35;
+    var ctx = canvas.get(0).getContext('2d');
+
     return {
 
         Hanoi: Backbone.Model.extend({
             defaults: {
                 solver: null,
-                numDiscs: 8,
-                speed: 50,
+                numDiscs: 3,
+                speed: 20,
                 state: STATE_STOP
             },
             validate: function(attrs) {
@@ -68,21 +90,25 @@ var App = function() {
                 var canvas = $('#canvas');
                 canvas.css('width', canvas.attr('width'));
                 canvas.css('height', canvas.attr('height'));
-                this.render();
+                this.stop();
             },
             calcInterval: function() {
-                return this.model.get('speed') + 100;
+                return 10 + (SPEED_MAX - this.model.get('speed')) / 2;
             },
             onTimer: function() {
-                console.log('onTimer');
                 if (this.model.get('state') !== STATE_PLAY) {
                     return;
                 }
-                var solver = this.model.get('solver');
-                this.render();
-                if (!solver.next()) { // とりあえず捨てる
-                    return;
+                if (!this.polesState.count--) {
+                    var solver = this.model.get('solver');
+                    var poles = solver.poles();
+                    var next = solver.next();
+                    this.polesState = new PolesState(poles, next);
+                    if (!next) {
+                        return;
+                    }
                 }
+                this.render();
                 setTimeout(_.bind(this.onTimer, this), this.calcInterval());
             },
             play: function(e) {
@@ -95,6 +121,7 @@ var App = function() {
                 console.log('stop');
                 this.model.set('state', STATE_STOP);
                 this.model.initSolver();
+                this.polesState = new PolesState(this.model.get('solver').poles());
                 this.render();
             },
             pause: function(e) {
@@ -103,7 +130,6 @@ var App = function() {
                 this.render();
             },
             changeSlideDiscs: function(e, ui) {
-                console.log('changeSlideDiscs: ' + ui.value);
                 if (this.model.get('numDiscs') !== ui.value) {
                     this.model.set('numDiscs', ui.value);
                     this.stop();
@@ -111,7 +137,6 @@ var App = function() {
                 this.render();
             },
             changeSlideSpeed: function(e, ui) {
-                console.log('changeSlideSpeed: ' + ui.value);
                 this.model.set('speed', ui.value);
                 this.render();
             },
@@ -132,14 +157,7 @@ var App = function() {
                 return this;
             },
             rederCanvas: function() {
-                var canvas = $('#canvas');
-                var width = canvas.attr('width');
-                var height = canvas.attr('height');
-                var h = 14;
-                var gh = 35;
-                var ctx = canvas.get(0).getContext('2d');
                 ctx.lineWidth = 2;
-
                 ctx.fillStyle = '#FFF';
                 ctx.fillRect(0, 0, width, height);
 
@@ -154,20 +172,34 @@ var App = function() {
 
                 ctx.strokeStyle = '#CCC';
                 ctx.strokeRect(0, 0, width, height);
-                var poles = this.model.get('solver').poles();
                 ctx.lineWidth = 1;
-                _.each(poles, function(pole, x) {
+                var s = this.polesState;
+                var renderDisc = _.bind(this.renderDisc, this);
+                _.each(s.poles, function(pole, x) {
                     _.each(pole, function(disc, y) {
-                        var w = disc * 15;
-                        var bx = 120 * x + 80;
-                        var by = height - gh - y * h;
-                        ctx.fillStyle = colors[disc - 1][0];
-                        ctx.fillRect(bx - w / 2, by + 1, w, h - 1);
-                        ctx.strokeStyle = colors[disc - 1][1];
-                        ctx.strokeRect(bx - w / 2, by + 1, w, h - 1);
+                        renderDisc(disc, x, y, 0, 0);
                     });
                 });
+
+                if (s.disc) {
+                    var vx = 120 * (s.fx - s.tx) * s.count / MOVING_SLICE;
+                    var vy = h * (s.fy - s.ty) * s.count / MOVING_SLICE;
+                    if (s.count) {
+                        ctx.globalAlpha = 0.5;
+                    }
+                    renderDisc(s.disc, s.tx, s.ty, vx, vy);
+                    ctx.globalAlpha = 1;
+                }
                 return this;
+            },
+            renderDisc: function(disc, x, y, ox, oy) {
+                var w = disc * 15;
+                var bx = 120 * x + 80;
+                var by = height - gh - y * h;
+                ctx.fillStyle = colors[disc - 1][0];
+                ctx.fillRect(bx - w / 2 + ox, by + 1 - oy, w, h - 1);
+                ctx.strokeStyle = colors[disc - 1][1];
+                ctx.strokeRect(bx - w / 2 + ox, by + 1 - oy, w, h - 1);
             }
         })
 
