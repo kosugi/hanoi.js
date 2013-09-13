@@ -160,6 +160,7 @@ var App = function() {
                 ctx.lineWidth = 2;
                 ctx.fillStyle = '#FFF';
                 ctx.fillRect(0, 0, width, height);
+                ctx.lineWidth = 1;
 
                 var g = ctx.createLinearGradient(0, 0, width * 0.5, height * 1.5);
                 g.addColorStop(0, '#CFF');
@@ -167,12 +168,13 @@ var App = function() {
                 ctx.fillStyle = g;
                 ctx.fillRect(0, 0, width, height - gh + h);
 
-                ctx.fillStyle = '#944';
+                ctx.fillStyle = '#C8A676';
+                ctx.strokeStyle = '#917247';
                 ctx.fillRect(0, height - gh + h, width, gh - h);
+                ctx.strokeRect(0, height - gh + h + 1, width, gh - h);
 
                 ctx.strokeStyle = '#CCC';
                 ctx.strokeRect(0, 0, width, height);
-                ctx.lineWidth = 1;
                 var s = this.polesState;
                 var renderDisc = _.bind(this.renderDisc, this);
                 _.each(s.poles, function(pole, x) {
